@@ -2,6 +2,7 @@ import cohere
 import os
 from dotenv import load_dotenv
 from time_date_module import get_system_time, get_system_date
+import pywhatkit as kit
 
 load_dotenv()
 
@@ -13,7 +14,9 @@ class Assistant:
 
     def handle_prompt(self, prompt):
         """Determine if prompt is a system query or needs to be sent to the LLM."""
-        if self.is_system_time_query(prompt):
+        if self.is_play_command(prompt):
+            return self.handle_play_command(prompt)
+        elif self.is_system_time_query(prompt):
             return self.get_time_response()
         elif self.is_system_date_query(prompt):
             return self.get_date_response()
@@ -43,23 +46,17 @@ class Assistant:
         response = f"Today's date is {system_date}."
         print(f"SYSTEM: {response}")
         return response
+    
+    def is_play_command(self, prompt):
+        """Check if the prompt is a play command for YouTube."""
+        return prompt.lower().strip().startswith("play ")
 
-    # def get_llm_response(self, prompt):
-    #     """Send the prompt to Cohere LLM and return the response."""
-    #     # Adding explicit instruction for a short response
-    #     short_prompt = f"Answer this question in 1-2 sentences: {prompt}"
-    #     print(f"SYSTEM: Sending prompt to Cohere: {short_prompt}")
-        
-    #     response = self.cohere_client.generate(
-    #         model='command-xlarge-nightly',
-    #         prompt=short_prompt,
-    #         max_tokens=50,
-    #         temperature=0.7
-    #     )
-        
-    #     text_response = response.generations[0].text.strip()
-    #     print(f"SYSTEM: Response from Cohere: {text_response}")
-    #     return text_response
+    def handle_play_command(self, prompt):
+        """Extract the song or video name and play it on YouTube."""
+        search_query = prompt.lower().replace("play ", "")
+        print(f"SYSTEM: Playing '{search_query}' on YouTube...")
+        kit.playonyt(search_query)
+        return f"Playing '{search_query}' on YouTube."
     
     def get_llm_response(self, prompt):
     
