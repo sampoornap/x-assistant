@@ -1,12 +1,13 @@
 from speech_to_text import InterlocusWhisper
 from response_generator import get_cohere_response
 from text_to_speech import speak_text
+from assistant import Assistant
 import os
 
 def run_voice_assistant():
     while True:
-        assistant = InterlocusWhisper()
-        transcription = assistant.listen_and_transcribe(duration=5)  # duration can be adjusted
+        assistant_listen = InterlocusWhisper()
+        transcription = assistant_listen.listen_and_transcribe(duration=5)  # duration can be adjusted
 
         if "stop" in transcription.lower():
             print("SYSTEM: Goodbye!")
@@ -19,7 +20,10 @@ def run_voice_assistant():
             break
         
         # Get response from Cohere
-        response = get_cohere_response(transcription)
+
+        assistant = Assistant()
+
+        response = assistant.handle_prompt(transcription)
         
         # Speak the response
         speak_text(response)
@@ -30,5 +34,5 @@ if __name__ == "__main__":
 
 
 
-    # Continuously listen and transcribe until the user says "stop"
+    
     
