@@ -12,20 +12,21 @@ def run_voice_assistant():
         if "stop" in transcription.lower():
             print("SYSTEM: Goodbye!")
             break  
+            
         else:
-            print(f"JARVIS: You said: {transcription}")
+            print(f"You said: {transcription}")
         
         if "stop" in transcription.lower():
             print("SYSTEM: Goodbye!")
             break
         
-        # Get response from Cohere
-
         assistant = Assistant()
 
-        response = assistant.handle_prompt(transcription)
+        if len(transcription.strip()) == 0:
+            response = "Hello! Feel free to ask me any question. I am here to help you."
+        else:
+            response = assistant.handle_prompt(transcription)
         
-        # Speak the response
         speak_text(response)
 
 if __name__ == "__main__":

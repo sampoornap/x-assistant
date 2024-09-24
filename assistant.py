@@ -2,6 +2,7 @@ import cohere
 import os
 from dotenv import load_dotenv
 from time_date_module import get_system_time, get_system_date
+from conversation_tracker import ConversationHistory
 import pywhatkit as kit
 
 load_dotenv()
@@ -10,10 +11,10 @@ COHERE_API_KEY = os.getenv('COHERE_API_KEY')
 
 class Assistant:
     def __init__(self):
+        self.history_tracker = ConversationHistory()
         self.cohere_client = cohere.Client(COHERE_API_KEY)
 
     def handle_prompt(self, prompt):
-        """Determine if prompt is a system query or needs to be sent to the LLM."""
         if self.is_play_command(prompt):
             return self.handle_play_command(prompt)
         elif self.is_system_time_query(prompt):
@@ -24,35 +25,29 @@ class Assistant:
             return self.get_llm_response(prompt)
     
     def is_system_time_query(self, prompt):
-        """Check if the prompt is asking for the current system time."""
         time_phrases = ["current time", "time is it", "what time", "now", "system time", "what is the time now"]
         return any(phrase in prompt.lower() for phrase in time_phrases)
     
     def is_system_date_query(self, prompt):
-        """Check if the prompt is asking for the current system date."""
         date_phrases = ["today's date", "what date is it", "current date", "system date"]
         return any(phrase in prompt.lower() for phrase in date_phrases)
 
     def get_time_response(self):
-        """Handle system time-related queries."""
         system_time = get_system_time()
         response = f"The current time is {system_time}."
         print(f"SYSTEM: {response}")
         return response
     
     def get_date_response(self):
-        """Handle system date-related queries."""
         system_date = get_system_date()
         response = f"Today's date is {system_date}."
         print(f"SYSTEM: {response}")
         return response
     
     def is_play_command(self, prompt):
-        """Check if the prompt is a play command for YouTube."""
         return prompt.lower().strip().startswith("play ")
 
     def handle_play_command(self, prompt):
-        """Extract the song or video name and play it on YouTube."""
         search_query = prompt.lower().replace("play ", "")
         print(f"SYSTEM: Playing '{search_query}' on YouTube...")
         kit.playonyt(search_query)
@@ -60,12 +55,15 @@ class Assistant:
     
     def get_llm_response(self, prompt):
     
-        co = cohere.Client(COHERE_API_KEY)
-        modified_prompt = f"Answer this in short and precisely in 1-2 sentences {prompt}"
-        print(f"SYSTEM: Sending prompt to Cohere: {prompt}")
-        response = co.generate(prompt = modified_prompt)
+        # co = cohere.Client(COHERE_API_KEY)
+        conversation_history = self.history_tracker.get_conversation_history()
+
+        modified_prompt = f"{conversation_history} User: Answer this in short and precisely in 1-2 sentences {prompt}"
+        # print(f"SYSTEM: Sending prompt to Cohere: {prompt}")
+        response = self.cohere_client.generate(prompt = modified_prompt)
         
         text_response = response.generations[0].text.strip()
-        print(f"SYSTEM: Response from Cohere: {text_response}")
+        # print(f"SYSTEM: Response from Cohere: {text_response}")
+        self.history_tracker.add_interaction(prompt, text_response)
         return text_response
 

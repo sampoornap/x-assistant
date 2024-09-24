@@ -66,15 +66,15 @@ class InterlocusWhisper:
 
 
 # Main function to test the assistant
-if __name__ == "__main__":
-    assistant = InterlocusWhisper()
+# if __name__ == "__main__":
+#     assistant = InterlocusWhisper()
 
-    # Continuously listen and transcribe until the user says "stop"
-    while True:
-        transcription = assistant.listen_and_transcribe(duration=5)  # duration can be adjusted
+#     # Continuously listen and transcribe until the user says "stop"
+#     while True:
+#         transcription = assistant.listen_and_transcribe(duration=5)  # duration can be adjusted
 
-        if "stop" in transcription.lower():
-            print("SYSTEM: Goodbye!")
-            break  
-        else:
-            print(f"JARVIS: You said: {transcription}")
+#         if "stop" in transcription.lower():
+#             print("SYSTEM: Goodbye!")
+#             break  
+#         else:
+#             print(f"JARVIS: You said: {transcription}")

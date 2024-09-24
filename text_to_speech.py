@@ -11,7 +11,7 @@ client = ElevenLabs(
 
 def speak_text(text):
 
-    print(f"JARVIS: {text}")
+    print(f"SYSTEM: {text}")
     audio = client.generate(
         text=text,
         voice="Chris",
